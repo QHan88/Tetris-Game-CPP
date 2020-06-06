@@ -7,69 +7,10 @@ using namespace std;
 
 Queue moveQueue;
 
+int execute(int move);
+
 unsigned int piece_size, numPieces, linePoints, alive, running;
 int storeAvailable, nextPiece, dropSpeed;
-
-//executes actions read from the moveQueue
-int execute(int move)
-{
-	int bottomed = 0;
-	switch(move){
-		case(DROP_BLOCK):
-			bottomed = dropPiece();
-			break;
-		case(AUTO_DROP):
-			bottomed = dropPiece();
-			break;
-		case(MOVE_RIGHT):
-			movePiece(1);
-			break;
-		case(MOVE_LEFT):
-			movePiece(-1);
-			break;
-		case(ROTATE_BLOCK_CLOCKWISE):
-			rotatePiece(1);
-			break;
-		case(ROTATE_BLOCK_COUNTERCLOCKWISE):
-			rotatePiece(-1);
-			break;
-		case(STORE_PIECE):
-			//only let the player store a piece once
-			//each time the piece falls to the ground
-			if(storeAvailable)
-			{
-				storePiece();
-				dispPiece(storeWin,storedPiece);
-				//in case the new piece was taken from nextPiece
-				dispPiece(hintWin,nextPiece);
-				storeAvailable = 0;
-			}
-			break;
-		case(PAUSE_GAME):
-			running = 0;
-			int handle = pauseGame();
-			if(handle < 0)
-			{
-				alive = 0;
-				running = 1;
-			}
-			else if(handle == 0)
-			{
-				bottomed = -1;
-				alive = 0;
-				running = 1;
-			}
-			else
-			{
-				running = 1;
-			}
-			break;
-
-
-	}
-	return bottomed;
-}
-
 
 int game()
 {
@@ -83,6 +24,7 @@ int game()
 	initGameWindows();
 	initBlockData();
 	initPieceData();
+
 
 	//Sets level and score, parameter is level
 	initLevelAndScore(setLevel);
@@ -146,10 +88,19 @@ int game()
 	dropThread.join();
 	inputThread.join();
 
+
 	werase(blockWin);   // remove block window
 	wrefresh(blockWin);
 	delwin(blockWin);
 
+
+    //mvwprintw(gameWin, 14, (gameWin_width/2)-6, "# Game Over # ");   // game over window
+    //dis_score();      // display score
+   // store_score(); // mvwprintw(gameWin, 18, (gameWin_width/2)-6, "Your score is: xx");
+	/*lastWin = newwin(lastWin_height, lastWin_width, lastWin_y, lastWin_x);
+    box(lastWin,0,0);
+    mvwprintw(lastWin, 14, lastWin_width/2 - 6, " GAME OVER !!!");
+    wrefresh(lastWin);*/
     int a = gameOver();
 
     if (a == -1){
@@ -158,6 +109,80 @@ int game()
     } else if( a == 0){
     	restartGame();
     }
+    //getch();
 
+	//endwin();
+
+	return restart;
+}
+
+//executes actions read from the moveQueue
+int execute(int move)
+{
+	int bottomed = 0;
+	switch(move){
+		case(DROP_BLOCK):
+			bottomed = dropPiece();
+			break;
+		case(AUTO_DROP):
+			bottomed = dropPiece();
+			break;
+		case(MOVE_RIGHT):
+			movePiece(1);
+			break;
+		case(MOVE_LEFT):
+			movePiece(-1);
+			break;
+		case(ROTATE_BLOCK_CLOCKWISE):
+			rotatePiece(1);
+			break;
+		case(ROTATE_BLOCK_COUNTERCLOCKWISE):
+			rotatePiece(-1);
+			break;
+		case(STORE_PIECE):
+			//only let the player store a piece once
+			//each time the piece falls to the ground
+			if(storeAvailable)
+			{
+				storePiece();
+				dispPiece(storeWin,storedPiece);
+				//in case the new piece was taken from nextPiece
+				dispPiece(hintWin,nextPiece);
+				storeAvailable = 0;
+			}
+			break;
+		case(PAUSE_GAME):
+			running = 0;
+			int handle = pauseGame();
+			if(handle < 0)
+			{
+				alive = 0;
+				running = 1;
+			}
+			else if(handle == 0)
+			{
+				bottomed = -1;
+				alive = 0;
+				running = 1;
+			}
+			else
+			{
+				running = 1;
+			}
+			break;
+
+
+	}
+	return bottomed;
+}
+
+int restartGame()
+{
+	initscr(); //Init Ncurses
+	noecho(); //function does not print input characters
+	curs_set(0); //make blinking cursor invisible
+	cbreak(); //ctrl + c will stop function
+	initColors();
+	int restart = game();
 	return restart;
 }

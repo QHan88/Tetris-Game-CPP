@@ -12,7 +12,7 @@ int menu()
     noecho(); //function does not print input characters
     curs_set(0); //make blinking cursor invisible
     cbreak(); //ctrl + c will stop function
-    // initColors();
+    initColors();
     initMenu();
 
     char ch;

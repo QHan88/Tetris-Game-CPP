@@ -36,10 +36,10 @@ int main()
 
   restart = game();
 
-  // while(restart)
-  // {
-  //    restart = restartGame();
-  // }
+  while(restart)
+  {
+     restart = restartGame();
+  }
 
   return 0;
 }
